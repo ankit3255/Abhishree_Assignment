@@ -41,6 +41,8 @@ c.execute('''CREATE TABLE articles
               author TEXT,
               date TEXT)''')
 
+csvfile = open(csv_filename, 'w', newline='')
+
 # Loop through each article and extract the information we want
 for i, article in enumerate(articles):
     # Get the headline
@@ -56,13 +58,15 @@ for i, article in enumerate(articles):
     date = article.find('time')['datetime']
     
     # Write the article information to the CSV file
-    with open(csv_filename, 'a', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow([i, link, headline, author, date])
-    
+    writer = csv.writer(csvfile)
+    writer.writerow([i, link, headline, author, date])
+    csvfile.close()
     # Write the article information to the SQLite database
     c.execute("INSERT INTO articles VALUES (?, ?, ?, ?, ?)", (i, link, headline, author, date))
 
 # Commit the changes to the database and close the connection
+import os
+
+print(os.path.abspath(csv_filename))
 conn.commit()
 conn.close()
